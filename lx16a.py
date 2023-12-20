@@ -28,8 +28,8 @@ class ServoLogicalError(ServoError):
 class _BSpline:
     def __init__(
         self,
-        knots: list[float],
-        control_points: list[tuple[float, float]],
+        knots: "list[float]",
+        control_points: "list[tuple[float, float]]",
         degree: int,
         num_samples: int,
     ):
@@ -64,7 +64,7 @@ class _BSpline:
         )
         return term1 + term2
 
-    def sample(self, u: float) -> tuple[float, float]:
+    def sample(self, u: float) -> "tuple[float, float]":
         sx = 0
         sy = 0
 
@@ -139,16 +139,16 @@ class LX16A:
     ############### Utility Functions ###############
 
     @staticmethod
-    def _checksum(packet: list[int]) -> int:
+    def _checksum(packet: "list[int]") -> int:
         s = ~sum(packet[2:])
         return s % 256
 
     @staticmethod
-    def _to_bytes(n: int) -> tuple[int, int]:
+    def _to_bytes(n: int) -> "tuple[int, int]":
         return n % 256, n // 256
 
     @staticmethod
-    def _check_packet(packet: list[int], servo_id: int) -> None:
+    def _check_packet(packet: "list[int]", servo_id: int) -> None:
         if sum(packet) == 0:
             raise ServoTimeoutError(f"Servo {servo_id}: not responding", servo_id)
         if LX16A._checksum(packet[:-1]) != packet[-1]:
@@ -156,13 +156,13 @@ class LX16A:
             raise ServoChecksumError(f"Servo {servo_id}: bad checksum", servo_id)
 
     @staticmethod
-    def _send_packet(packet: list[int]) -> None:
+    def _send_packet(packet: "list[int]") -> None:
         packet = [0x55, 0x55, *packet]
         packet.append(LX16A._checksum(packet))
         LX16A._controller.write(bytes(packet))
 
     @staticmethod
-    def _read_packet(num_bytes: int, servo_id: int) -> list[int]:
+    def _read_packet(num_bytes: int, servo_id: int) -> "list[int]":
         received = LX16A._controller.read(num_bytes + 6)
 
         if len(received) != num_bytes + 6:
@@ -402,8 +402,8 @@ class LX16A:
 
     def set_bspline(
         self,
-        knots: list[float],
-        control_points: list[tuple[float, float]],
+        knots: "list[float]",
+        control_points: "list[tuple[float, float]]",
         degree: int,
         num_samples: int = 100,
     ) -> None:
@@ -417,7 +417,7 @@ class LX16A:
 
     ################ Read Commands ################
 
-    def get_last_instant_move_hw(self) -> tuple[float, int]:
+    def get_last_instant_move_hw(self) -> "tuple[float, int]":
         packet = [self._id, 3, 2]
         LX16A._send_packet(packet)
 
@@ -426,7 +426,7 @@ class LX16A:
         time = received[2] + received[3] * 256
         return angle, time
 
-    def get_last_delayed_move_hw(self) -> tuple[float, int]:
+    def get_last_delayed_move_hw(self) -> "tuple[float, int]":
         packet = [self._id, 3, 8]
         LX16A._send_packet(packet)
 
@@ -458,7 +458,7 @@ class LX16A:
 
         return LX16A._from_servo_range(received[0])
 
-    def get_angle_limits(self, poll_hardware: bool = False) -> tuple[float, float]:
+    def get_angle_limits(self, poll_hardware: bool = False) -> "tuple[float, float]":
         if not poll_hardware:
             return LX16A._from_servo_range(
                 self._angle_limits[0]
@@ -472,7 +472,7 @@ class LX16A:
         upper_limit = LX16A._from_servo_range(received[2] + received[3] * 256)
         return lower_limit, upper_limit
 
-    def get_vin_limits(self, poll_hardware: bool = False) -> tuple[int, int]:
+    def get_vin_limits(self, poll_hardware: bool = False) -> "tuple[int, int]":
         if not poll_hardware:
             return self._vin_limits
 
@@ -543,7 +543,7 @@ class LX16A:
 
     def get_led_error_triggers(
         self, poll_hardware: bool = False
-    ) -> tuple[bool, bool, bool]:
+    ) -> "tuple[bool, bool, bool]":
         if not poll_hardware:
             return self._led_error_triggers
 
