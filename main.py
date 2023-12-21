@@ -3,7 +3,7 @@ from lx16a import *
 import time
 
 # Initialize the LX16A controller and create LX16A objects for each servo
-LX16A.initialize("/dev/ttyUSB0", 0.1)
+LX16A.initialize("/dev/ttyAMA0", 0.1)
 
 servo1 = LX16A(1)
 servo2 = LX16A(2)
